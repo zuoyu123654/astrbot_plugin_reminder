@@ -1,0 +1,19 @@
+{
+  "default_minutes": {
+    "description": "没给具体时间时默认多久后回来",
+    "hint": "「等我吃完饭再聊」这种没给时间的，默认 30 分钟。",
+    "type": "int",
+    "default": 30
+  },
+  "max_horizon_days": {
+    "description": "最远能排到几天后",
+    "type": "int",
+    "default": 30
+  },
+  "min_lead_seconds": {
+    "description": "最短提前量（秒）",
+    "hint": "算出来的时间太近（比如就在几秒后），压到这个值之后。",
+    "type": "int",
+    "default": 60
+  }
+}
