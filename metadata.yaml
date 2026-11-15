@@ -10,7 +10,7 @@ desc: |-
   - 到点不是念闹钟，而是把主 agent 唤醒，让人格自己写一句话发过去
 
   实现上直接复用 AstrBot 的 cron（active_agent 任务），所以重启不丢、Dashboard 里能看见。
-version: 0.1.0
+version: 0.1.1
 author: paopao
 astrbot_version: ">=4.15.0"
 support_platforms:
