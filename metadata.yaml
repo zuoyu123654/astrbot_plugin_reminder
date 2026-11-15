@@ -1,0 +1,21 @@
+name: astrbot_plugin_reminder
+display_name: 到点提醒
+short_desc: 她答应「半小时后提醒你」「中午来找你」就真的会来——到点由她自己发消息。
+desc: |-
+  给主模型一个提醒入口（remind_me）。
+
+  - 「半小时后提醒我喝水」「20 分钟后叫我」→ 按分钟排
+  - 「晚上 8 点来找我」「中午来找我」「明天早上 7 点」→ 模型换算成具体时间
+  - 「等我吃完饭再聊」这类没给时间的 → 默认 30 分钟后回来找他
+  - 到点不是念闹钟，而是把主 agent 唤醒，让人格自己写一句话发过去
+
+  实现上直接复用 AstrBot 的 cron（active_agent 任务），所以重启不丢、Dashboard 里能看见。
+version: 0.1.0
+author: paopao
+astrbot_version: ">=4.15.0"
+support_platforms:
+  - aiocqhttp
+tags:
+  - 提醒
+  - 定时
+  - 主动消息
