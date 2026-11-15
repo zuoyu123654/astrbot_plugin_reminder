@@ -23,8 +23,17 @@ from astrbot.api import logger
 from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.api.star import Context, Star, register
 
+try:  # 用户侧注入用（本轮附加内容，不动系统提示词）
+    from astrbot.core.agent.message import TextPart  # type: ignore
+except Exception:  # noqa: BLE001
+    try:
+        from astrbot.api.message_components import TextPart  # type: ignore
+    except Exception:  # noqa: BLE001
+        TextPart = None  # type: ignore
+
+
 PLUGIN_NAME = "astrbot_plugin_reminder"
-PLUGIN_VERSION = "0.1.0"
+PLUGIN_VERSION = "0.1.1"
 
 DEFAULTS = {
     "default_minutes": 30,      # 没给具体时间（「等我吃完饭再聊」）时默认多少分钟后回来
@@ -278,6 +287,26 @@ class ReminderPlugin(Star):
             return
         if not any(w in text for w in self.TIME_WORDS):
             return
+        hint = self.REMINDER_HINT.strip()
+        # 首选：作为「本轮用户侧附加内容」注入。
+        # 好处是系统提示词一个字都不动，前缀缓存保持有效；
+        # 这份内容只作用于当前这一轮，不会写进历史。
+        try:
+            parts = getattr(req, "extra_user_content_parts", None)
+            if parts is not None and TextPart is not None:
+                for part in parts:
+                    if "提醒功能硬规则" in str(getattr(part, "text", "")):
+                        return
+                part = TextPart(text=hint)
+                make_temp = getattr(part, "make_as_temp", None)
+                if callable(make_temp):  # 新版本支持标记为临时内容
+                    part = make_temp()
+                parts.append(part)
+                return
+        except Exception:  # noqa: BLE001
+            logger.debug("[Reminder] 用户侧注入失败，回退系统提示词", exc_info=True)
+
+        # 回退：老版本没有 extra_user_content_parts，才动系统提示词
         try:
             current = str(getattr(req, "system_prompt", "") or "")
             if "提醒功能硬规则" in current:
